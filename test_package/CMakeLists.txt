@@ -1,5 +1,7 @@
-project(PackageTest CXX)
-cmake_minimum_required(VERSION 2.8.12)
+project(test_package)
+cmake_minimum_required(VERSION 2.8.11)
+
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
@@ -8,7 +10,7 @@ set(PYTHON_INCLUDE_DIR "${CONAN_INCLUDE_DIRS_CPYTHON}")
 find_package(PythonLibs REQUIRED)
 find_package(PythonInterp REQUIRED)
 
-add_library(spam SHARED example.cpp)
+add_library(spam SHARED test_package.cpp)
 #target_link_libraries(spam ${PYTHON_LIBRARY})
 target_include_directories(spam
     PRIVATE
