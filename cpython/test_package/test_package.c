@@ -18,7 +18,7 @@ spam_system(PyObject *self, PyObject *args)
     return PyLong_FromLong(sts);
 }
 
-static const char *spam_doc = "This is an example spam doc.";
+const char spam_doc[] = "This is an example spam doc.";
 
 static PyMethodDef SpamMethods[] = {
     {"system",  spam_system, METH_VARARGS, "Execute a shell command."},
