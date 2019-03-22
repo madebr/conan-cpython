@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from conan.packager import ConanMultiPackager
+from bincrafters import build_shared
 from conans.util.env_reader import get_env
 import os
 
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     else:
         subdir = "cpython"
 
-    builder = ConanMultiPackager(
+    builder = build_shared.get_builder(
         cwd=os.path.join(os.path.dirname(os.path.realpath(__file__)), subdir),
         docker_entry_script="cd {}".format(subdir)
     )

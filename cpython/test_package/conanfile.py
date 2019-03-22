@@ -9,9 +9,6 @@ class TestPackageConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
 
-    def requirements(self):
-        self.requires("cpython/3.7.2@maarten/testing")
-
     def build(self):
         cmake = CMake(self)
         cmake.definitions["CONAN_CPYTHON_VERSION"] = self.deps_user_info["cpython"].VERSION

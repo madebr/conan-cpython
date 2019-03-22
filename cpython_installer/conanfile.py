@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from conans import ConanFile
-from conans.client.tools.oss import detected_os, detected_architecture
 import os
 import shutil
 import sys
@@ -17,56 +16,49 @@ class CPythonInstallerConan(ConanFile):
     author = "Bincrafters <bincrafters@gmail.com>"
     license = "PSF"
 
-    exports = ("../cpython_common.py")
+    exports = ("../cpython_common.py", )
+    exports_sources = ("../config.site", "../LICENSE.md", )
 
     settings = "os_build", "arch_build", "compiler"
 
     _source_subfolder = "sources"
 
-    def _os(self):
-        return self.settings.os_build
+    _common = None
+    def _add_common(self):
+        curdir = os.path.dirname(os.path.realpath(__file__))
+        pardir = os.path.dirname(curdir)
+        sys.path.insert(0, curdir)
+        sys.path.insert(0, pardir)
+        from cpython_common import CPythonCommon
+        self._common = CPythonCommon(self, True)
 
-    def _arch(self):
-        return self.settings.arch_build
-
-    def _is_crosscompile(self):
-        return self._os() != detected_os or self._arch() != detected_architecture
-
-    def _build_type(self):
-        return "Release"
-
-    def _python_regen(self):
-        raise Exception("cpython_installer cannot be cross built")
+    def configure(self):
+        self._add_common()
+        self._common.configure()
 
     def config_options(self):
-        sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-        from cpython_common import cpython_config_options
-        cpython_config_options(self)
+        self._add_common()
+        self._common.config_options()
 
     def build_requirements(self):
-        sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-        from cpython_common import cpython_get_requirements
-        for req in cpython_get_requirements(self):
-            self.build_requires(req)
-        if self._is_crosscompile():
-            raise Exception("cpython_installer cannot be cross built")
+        self._add_common()
+        self._common.build_requirements()
+
+    def requirements(self):
+        self._add_common()
+        self._common.requirements()
 
     def source(self):
-        sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-        from cpython_common import cpython_source
-        cpython_source(self)
+        self._add_common()
+        self._common.source()
 
     def build(self):
-        sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-        from cpython_common import cpython_build
-        cpython_build(self)
+        self._add_common()
+        self._common.build()
 
     def package(self):
-        sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-        from cpython_common import cpython_package
-        cpython_package(self)
-
-        shutil.rmtree(os.path.join(self.package_folder, "include"))
+        self._add_common()
+        self._common.package()
 
     def package_id(self):
         del self.info.settings.compiler
@@ -80,12 +72,4 @@ class CPythonInstallerConan(ConanFile):
 
         self.user_info.VERSION = self.version
 
-
-try:
-    sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-    from cpython_common import cpython_options, cpython_default_options
-    CPythonInstallerConan.options = cpython_options()
-    CPythonInstallerConan.default_options = cpython_default_options()
-except ImportError:
-    CPythonInstallerConan.options = []
-    CPythonInstallerConan.default_options = []
+        self.user_info.CPYTHON_BIN = os.path.join(self.package_folder, "bin", "python")
