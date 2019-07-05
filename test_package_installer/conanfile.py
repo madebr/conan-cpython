@@ -1,7 +1,7 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from conans import ConanFile, CMake, tools
+from io import StringIO
 
 
 class TestPackageConan(ConanFile):
@@ -23,3 +23,5 @@ class TestPackageConan(ConanFile):
         if not tools.cross_building(self.settings):
             cmake = CMake(self)
             cmake.test()
+
+        assert tools.which("python3").startswith(str(self.deps_cpp_info["cpython_installer"].rootpath))
